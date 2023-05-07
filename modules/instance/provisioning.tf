@@ -17,7 +17,7 @@ resource "null_resource" "docker-swarm-manager" {
 # Устанавливаем на manage ноду git, docker-compose, активируем режим docker swarm, поднимаем вэб-панель portainer для визуального управления кластером и сервисами стэка.
   provisioner "remote-exec" {
     inline = [
-      "sudo dd-apt-repository ppa:git-core/ppa && sudo apt update -y && sudo apt install git curl -y",
+      "sudo add-apt-repository ppa:git-core/ppa -y && sudo apt update -y && sudo apt install git curl -y",
       "sudo apt-get install -y ca-certificates curl gnupg lsb-release gnome-terminal  apt-transport-https gnupg-agent software-properties-common",
       "sudo mkdir -p /etc/apt/keyrings",
       "sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg",
@@ -70,8 +70,8 @@ resource "null_resource" "docker-swarm-worker" {
 # Устанавливаем на manage ноду git, docker-compose, даём права на исполнение скрипта для запуска и запускаем
   provisioner "remote-exec" {
     inline = [
-      "sudo add-apt-repository ppa:git-core/ppa && sudo apt update -y && sudo apt install git curl -y",
-      "sudo apt-get install -y ca-certificates curl gnupg lsb-release gnome-terminal  apt-transport-https gnupg-agent software-properties-common",
+      "sudo add-apt-repository ppa:git-core/ppa -y && sudo apt update -y && sudo apt install git curl -y",
+      "sudo apt-get install -y ca-certificates curl gnupg lsb-release gnome-terminal apt-transport-https gnupg-agent software-properties-common",
       "sudo mkdir -p /etc/apt/keyrings",
       "sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg",
       "sudo echo 'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable' | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null",
