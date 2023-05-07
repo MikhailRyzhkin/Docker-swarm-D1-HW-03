@@ -45,4 +45,23 @@
 3. Сделать скриншоты.
 4. Предоставить доступ к репозиторию и скриншотам для проверки.
 
+![1](https://user-images.githubusercontent.com/69116076/236702133-886de035-3096-4b61-a617-aa3080b86634.png)
+
+![2](https://user-images.githubusercontent.com/69116076/236702137-2d034965-9a7e-49b0-86dd-c5520d06f8d8.png)
+
+![3](https://user-images.githubusercontent.com/69116076/236702143-1092f201-219e-4a95-83bc-1fd97b9a026b.png)
+
+![4](https://user-images.githubusercontent.com/69116076/236702151-cab7637a-63ee-4cfc-86b3-8ad514131989.png)
+
+![5](https://user-images.githubusercontent.com/69116076/236702161-fd8131f2-d381-482d-9893-344faf22400f.png)
+
+![6](https://user-images.githubusercontent.com/69116076/236702167-ef9314c1-e263-4559-8ca3-4de22a787ead.png)
+
+![7](https://user-images.githubusercontent.com/69116076/236702171-82a0ad91-50c4-413c-ab2b-12e69f427da8.png)
+
+![8](https://user-images.githubusercontent.com/69116076/236702177-46f3e9b0-df3b-4e34-b355-547a6e155d70.png)
+
+![9](https://user-images.githubusercontent.com/69116076/236702186-d6709159-773f-486a-a1ef-4fe1c6fd55db.png)
+
+![10](https://user-images.githubusercontent.com/69116076/236702192-dce9e06b-e2ef-4a63-9065-3f2ee8c06e9d.png)
 
