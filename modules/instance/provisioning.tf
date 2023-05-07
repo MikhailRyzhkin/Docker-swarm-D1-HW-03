@@ -67,19 +67,13 @@ resource "null_resource" "docker-swarm-worker" {
     destination = "~/join.sh"
   }
 
-# Устанавливаем на manage ноду git, docker-compose, даём права на исполнение скрипта для запуска и запускаем
+# Устанавливаем на worker ноду git, docker-compose, даём права на исполнение скрипта для запуска и запускаем
   provisioner "remote-exec" {
     inline = [
-      "sudo add-apt-repository ppa:git-core/ppa -y && sudo apt update -y && sudo apt install git curl -y",
-      "sudo apt-get install -y ca-certificates curl gnupg lsb-release gnome-terminal  apt-transport-https gnupg-agent software-properties-common",
-      "sudo mkdir -p /etc/apt/keyrings",
-      "sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg",
-      "sudo echo 'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable' | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null",
-      "sudo apt-get update && apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y",
+      "curl -fsSL https://get.docker.com | sh",
       "sudo usermod -aG docker $USER",
-      "sudo systemctl enable docker.service && sudo systemctl enable containerd.service && sudo systemctl start docker.service && sudo systemctl start containerd.service",
-      "sudo chmod +x ~/join.sh",
-      "sudo ~/join.sh"
+      "chmod +x ~/join.sh",
+      "~/join.sh"
     ]
   }
 }
