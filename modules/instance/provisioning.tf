@@ -10,7 +10,7 @@ resource "null_resource" "docker-swarm-manager" {
 
 # Копируем в manage ноду docker-compose файл для разворачивания стэка
   provisioner "file" {
-    source      = "/home/mikhail/GIT_REPO/github/skillfactory/Docker/Microservices-D1.3-HW-03/docker-compose/docker-compose.yml"
+    source      = "/home/mikhail/GIT_REPO/github/skillfactory/Docker/Docker-swarm-D1-HW-03/docker-compose/docker-compose.yml"
     destination = "~/docker-compose.yml"
   }
 
@@ -96,7 +96,7 @@ resource "null_resource" "docker-swarm-manager-start" {
 # Деплой проекта магазина из docker-compose.yml на manage ноде по кластеру
   provisioner "remote-exec" {
     inline = [
-        "sudo docker stack deploy --compose-file /home/mikhail/GIT_REPO/github/skillfactory/Docker/Microservices-D1.3-HW-03/docker-compose/docker-compose.yml sockshop-swarm"
+      "docker stack deploy --compose-file ~/docker-compose.yml sockshop-swarm"
     ]
   }
 
