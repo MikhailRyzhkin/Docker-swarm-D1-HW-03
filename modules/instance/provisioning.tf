@@ -11,7 +11,7 @@ resource "null_resource" "docker-swarm-manager" {
 # Копируем в manage ноду docker-compose файл для разворачивания стэка
   provisioner "file" {
     source      = "/home/mikhail/GIT_REPO/github/skillfactory/Docker/Docker-swarm-D1-HW-03/docker-compose/docker-compose.yml"
-    destination = "~/docker-compose.yml"
+    destination = "/home/ubuntu/docker-compose.yml"
   }
 
 # Устанавливаем на manage ноду git, docker-compose, активируем режим docker swarm, поднимаем вэб-панель portainer для визуального управления кластером и сервисами стэка.
@@ -72,7 +72,7 @@ resource "null_resource" "docker-swarm-worker" {
     inline = [
       "curl -fsSL https://get.docker.com | sh",
       "sudo usermod -aG docker $USER",
-      "chmod +x ~/join.sh",
+      "chmod +x /home/ubuntu/join.sh",
       "~/join.sh"
     ]
   }
@@ -90,7 +90,7 @@ resource "null_resource" "docker-swarm-manager-start" {
 # Деплой проекта магазина из docker-compose.yml на manage ноде по кластеру
   provisioner "remote-exec" {
     inline = [
-      "docker stack deploy --compose-file ~/docker-compose.yml sockshop-swarm"
+      "docker stack deploy --compose-file /home/ubuntu/docker-compose.yml sockshop-swarm"
     ]
   }
 
