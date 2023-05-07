@@ -8,27 +8,24 @@ resource "null_resource" "docker-swarm-manager" {
     host        = yandex_compute_instance.vm-manager[count.index].network_interface.0.nat_ip_address
   }
 
-# Копируем в manage ноду docker-compose файл для разворачивания стэка
+# Копируем в manage ноду docker-compose файл по относительному пути от папки проекта для разворачивания стэка на будущих нодах
+# https://developer.hashicorp.com/terraform/language/resources/provisioners/file
   provisioner "file" {
-    source      = "/home/mikhail/GIT_REPO/github/skillfactory/Docker/Docker-swarm-D1-HW-03/docker-compose/docker-compose.yml"
+    source      = "docker-compose/docker-compose.yml"
     destination = "/home/ubuntu/docker-compose.yml"
   }
 
 # Устанавливаем на manage ноду git, docker-compose, активируем режим docker swarm, поднимаем вэб-панель portainer для визуального управления кластером и сервисами стэка.
+# https://developer.hashicorp.com/terraform/language/resources/provisioners/remote-exec
   provisioner "remote-exec" {
     inline = [
-      "sudo add-apt-repository ppa:git-core/ppa -y && sudo apt update -y && sudo apt install git curl -y",
-      "sudo apt-get install -y ca-certificates curl gnupg lsb-release gnome-terminal  apt-transport-https gnupg-agent software-properties-common",
-      "sudo mkdir -p /etc/apt/keyrings",
-      "sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg",
-      "sudo echo 'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable' | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null",
-      "sudo apt-get update && apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y",
+      "sudo apt-get install -y git curl ca-certificates curl gnupg lsb-release gnome-terminal apt-transport-https gnupg-agent software-properties-common",
+      "curl -fsSL https://get.docker.com | sh",
       "sudo usermod -aG docker $USER",
+      "sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y",
       "sudo systemctl enable docker.service && sudo systemctl enable containerd.service && sudo systemctl start docker.service && sudo systemctl start containerd.service",
-      "sudo docker swarm init",
-      "sudo curl -L https://downloads.portainer.io/ce2-18/portainer-agent-stack.yml -o portainer-agent-stack.yml",
-      "sudo docker stack deploy -c portainer-agent-stack.yml portainer",
-      "sleep 20",
+      "sudo docker swarm init",      
+      "sleep 25",
       "echo COMPLETED"
     ]
   }
@@ -44,7 +41,8 @@ resource "null_resource" "docker-swarm-manager-join" {
     host        = yandex_compute_instance.vm-manager[count.index].network_interface.0.nat_ip_address
   }
 
-# Создаём скрипт с командой добавления worker ноды к кластеру docker swarm.
+# Создаём скрипт с командой добавления worker ноды к кластеру docker swarm и сохраняем локально в рабочем каталоге
+# https://developer.hashicorp.com/terraform/language/resources/provisioners/local-exec
   provisioner "local-exec" {
     command = "TOKEN=$(ssh -i ${var.ssh_credentials.private_key} -o StrictHostKeyChecking=no ${var.ssh_credentials.user}@${yandex_compute_instance.vm-manager[count.index].network_interface.0.nat_ip_address} docker swarm join-token -q worker); echo \"#!/usr/bin/env bash\nsudo docker swarm join --token $TOKEN ${yandex_compute_instance.vm-manager[count.index].network_interface.0.nat_ip_address}:2377\nexit 0\" >| join.sh"
   }
@@ -61,19 +59,20 @@ resource "null_resource" "docker-swarm-worker" {
     host        = yandex_compute_instance.vm-worker[count.index].network_interface.0.nat_ip_address
   }
 
-# Копируем скрипт с токеном созданый на manage ноде в worker ноду для присоединения к кластеру. 
+# Копируем локально расположенный скрипт с токеном, созданый на manage ноде, в worker ноду для присоединения к кластеру. 
   provisioner "file" {
     source      = "join.sh"
-    destination = "~/join.sh"
+    destination = "/home/ubuntu/join.sh"
   }
 
-# Устанавливаем на worker ноду git, docker-compose, даём права на исполнение скрипта для запуска и запускаем
+# Устанавливаем на docker, даём права на исполнение скрипта для запуска и запускаем
+# https://developer.hashicorp.com/terraform/language/resources/provisioners/remote-exec
   provisioner "remote-exec" {
     inline = [
       "curl -fsSL https://get.docker.com | sh",
       "sudo usermod -aG docker $USER",
       "chmod +x /home/ubuntu/join.sh",
-      "~/join.sh"
+      "/home/ubuntu/join.sh"
     ]
   }
 }
@@ -88,13 +87,17 @@ resource "null_resource" "docker-swarm-manager-start" {
   }
 
 # Деплой проекта магазина из docker-compose.yml на manage ноде по кластеру
+# https://developer.hashicorp.com/terraform/language/resources/provisioners/remote-exec
   provisioner "remote-exec" {
     inline = [
-      "docker stack deploy --compose-file /home/ubuntu/docker-compose.yml sockshop-swarm"
+      "docker stack deploy --compose-file /home/ubuntu/docker-compose.yml sockshop-swarm",
+      "curl -L https://downloads.portainer.io/ce2-18/portainer-agent-stack.yml -o portainer-agent-stack.yml",
+      "docker stack deploy --compose-file portainer-agent-stack.yml portainer"
     ]
   }
 
-# Удаление скрипта для присоединения worker ноды к кластеру
+# Удаление расположенного локально скрипта присоединения worker ноды к кластеру
+# https://developer.hashicorp.com/terraform/language/resources/provisioners/local-exec
   provisioner "local-exec" {
     command = "rm -rf join.sh"
   }
