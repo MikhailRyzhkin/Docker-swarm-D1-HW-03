@@ -71,7 +71,7 @@ resource "null_resource" "docker-swarm-worker" {
   provisioner "remote-exec" {
     inline = [
       "sudo add-apt-repository ppa:git-core/ppa -y && sudo apt update -y && sudo apt install git curl -y",
-      "sudo apt-get install -y ca-certificates curl gnupg lsb-release gnome-terminal apt-transport-https gnupg-agent software-properties-common",
+      "sudo apt-get install -y ca-certificates curl gnupg lsb-release gnome-terminal  apt-transport-https gnupg-agent software-properties-common",
       "sudo mkdir -p /etc/apt/keyrings",
       "sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg",
       "sudo echo 'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable' | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null",
@@ -96,7 +96,7 @@ resource "null_resource" "docker-swarm-manager-start" {
 # Деплой проекта магазина из docker-compose.yml на manage ноде по кластеру
   provisioner "remote-exec" {
     inline = [
-        "sudo docker stack deploy --compose-file ~/docker-compose.yml sockshop-swarm"
+        "sudo docker stack deploy --compose-file /home/mikhail/GIT_REPO/github/skillfactory/Docker/Microservices-D1.3-HW-03/docker-compose/docker-compose.yml sockshop-swarm"
     ]
   }
 
